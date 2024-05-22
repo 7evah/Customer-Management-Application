@@ -31,7 +31,6 @@ if (isset($_GET['id'])) {
     exit();
 }
 
-// Close the prepared statement
 $stmt->close();
 
 

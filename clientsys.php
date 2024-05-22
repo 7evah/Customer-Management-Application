@@ -1,3 +1,20 @@
+<?php
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['user_id']) && !isset($_COOKIE['user_id'])) {
+    header('Location: loginpage.php');
+    exit();
+}
+
+// Set the session if the cookie is set
+if (isset($_COOKIE['user_id'])) {
+    $_SESSION['user_id'] = $_COOKIE['user_id'];
+}
+
+include 'config.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,23 +25,33 @@
 </head>
 <body>
     <h1>Admin Panel</h1>
-
-    <h2>clients</h2>
-    <a href="" class="button" style="margin-bottom: 10px;">import</a>
-    <a href="" class="button" style="margin-bottom: 10px;">export</a>
+    <div class="logout-container">
+        <form action="logout.php" method="post">
+            <button type="submit" class="button logout-button">Logout</button>
+        </form>
+    </div>
+    <h2>Clients</h2>
+    <!-- Import form -->
+    <form action="importcsv.php" method="post" enctype="multipart/form-data" style="margin-bottom: 10px;">
+        <input type="file" name="file" accept=".csv">
+        <button type="submit" class="button">Import CSV</button>
+    </form>
+    <!-- Export link -->
+    <a href="exportcsv.php" class="button" style="margin-bottom: 10px;">Export CSV</a><br>
+    <a href="insertclient.php" class="button" style="margin-bottom: 10px;">Add Client</a>
     <table>
         <thead>
             <tr>
-                <th>client id</th>
-                <th>full name</th>
-                <th>email adress</th>
-                <th>phone number</th>
+                <th>Client ID</th>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Phone Number</th>
             </tr>
         </thead>
         <tbody>
             <?php
-            include 'config.php';
-            $sql = "SELECT * FROM clients";
+            $userid = $_SESSION['user_id'];
+            $sql = "SELECT * FROM clients WHERE userID = $userid";
             $result = $conn->query($sql);
 
             if ($result->num_rows > 0) {
